@@ -79,11 +79,26 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FName BulletSpawnSocketName;
 
-	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category= "VFX | Sound")
+	TObjectPtr<USoundBase> FireSound;
 
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category= "VFX | Sound")
+	TObjectPtr<USoundBase> ExplosionSound;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category= "VFX | Particle")
+	TObjectPtr<UParticleSystem> ExplosionParticle;
+
+	UFUNCTION()
+	void OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	/** Called when hit by an asteroid or a bullet */
+	UFUNCTION(BlueprintCallable)
+	void OnDeathHandler();	
+
+public:
+
+	/** Called via GM after dead if the player has not used all retry points  */
+	void OnRetryHandler();
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;

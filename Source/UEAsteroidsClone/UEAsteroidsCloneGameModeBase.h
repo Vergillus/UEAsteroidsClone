@@ -3,10 +3,23 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Asteroid.h"
+#include "AsteroidDataAsset.h"
 #include "GameFramework/GameModeBase.h"
 #include "UEAsteroidsCloneGameModeBase.generated.h"
 
 class UAsteroidDataAsset;
+
+UENUM(BlueprintType)
+enum class ESpawnDirections : uint8
+{
+	ESD_Top,
+	ESD_Bottom,
+	ESD_Left,
+	ESD_Right,
+
+	ESD_NONE
+};
 
 /**
  * 
@@ -21,6 +34,8 @@ class UEASTEROIDSCLONE_API AUEAsteroidsCloneGameModeBase : public AGameModeBase
 
 public:
 
+	AUEAsteroidsCloneGameModeBase();
+
 	static void SetScore(const int32 Value);
 
 protected:
@@ -28,15 +43,69 @@ protected:
 	virtual void BeginPlay() override;
 	
 	const int32 PlayerTotalRetryAmount = 3;
-	int32 PlayerCurrentRetryAmount = 0;
+	int32 PlayerCurrentRetryAmount;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly , Category= "Spawn")
+	float AsteroidSpawnInterval;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly , Category= "Spawn")
+	float UFOSpawnInterval;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly , Category= "Spawn")
+	float PlayerRetryDelay;
 
 	UPROPERTY(EditAnywhere)
-	TArray<TSubclassOf<UAsteroidDataAsset>> AsteroidsDataArray;
+	TSubclassOf<AAsteroid> AsteroidToSpawn;	
+	
+	UPROPERTY(EditAnywhere)
+	TArray<UAsteroidDataAsset*> AsteroidsDataArray;
 
-	// TODO: Asteroids Spawner timer
+	const TArray<ESpawnDirections> SpawnDirections
+	{
+		ESpawnDirections::ESD_Top,
+		ESpawnDirections::ESD_Bottom,
+		ESpawnDirections::ESD_Left,
+		ESpawnDirections::ESD_Right
+	};
+
+#pragma region Timer Handles
+
+	FTimerHandle AsteroidSpawnTimerHandle;
+	FTimerHandle UFOSpawnTimerHandle;
+	FTimerHandle PlayerRetryTimerHandle;
+#pragma endregion
+
+#pragma region Timer Functions
+
+	UFUNCTION()
+	void SpawnAsteroidTimerElapsed();
+
+	UFUNCTION()
+	void PlayerRetryTimerElapsed();
+#pragma endregion 
+
+	
 	// TODO: UFO Spawner timer
 	// TODO: UI events
-	// TODO: Player dead function
-	//void SpawnAsteroid(UAsteroidDataAsset AsteroidData);
+	
+
+	FVector GetRandomSpawnPoint() const;
+
+public:
+
+	/* Spawns asteroids at random positions */
+	UFUNCTION(BlueprintCallable)
+	void SpawnAsteroid(UAsteroidDataAsset* AsteroidData) const;
+
+	/* Spawns given number of  asteroid(s) at given position */	
+	UFUNCTION(BlueprintCallable)
+	void SpawnAsteroidAtPosition(UAsteroidDataAsset* AsteroidData, FVector SpawnPosition ,int Amount = 1);
+
+	UFUNCTION(BlueprintCallable)
+	UAsteroidDataAsset* GetAsteroidDataByType(EAsteroidType AsteroidType) const;
+
+	/* Called via player ship when it is dead **/
+	UFUNCTION(BlueprintCallable)
+	void PlayerDead();
 	
 };

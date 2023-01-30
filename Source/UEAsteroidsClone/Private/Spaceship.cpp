@@ -10,6 +10,8 @@
 #include "EnhancedInputSubsystems.h"
 #include "ScreenWarper.h"
 #include "Components/InputComponent.h"
+#include "Kismet/GameplayStatics.h"
+#include "UEAsteroidsClone/UEAsteroidsCloneGameModeBase.h"
 
 #include "UEAsteroidsClone/Public/Bullet.h"
 
@@ -19,13 +21,15 @@ ASpaceship::ASpaceship() :
 	BulletSpawnSocketName("BulletSpawnLoc")
 {
  	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 
 	RootComp = CreateDefaultSubobject<USphereComponent>(TEXT("Sphere Collider"));
 	RootComponent = RootComp;
+	RootComp->OnComponentBeginOverlap.AddDynamic(this, &ASpaceship::OnOverlapBegin);
 
 	SpaceshipMesh = CreateDefaultSubobject<UStaticMeshComponent>("Spaceship Mesh");
 	SpaceshipMesh->SetupAttachment(RootComponent);
+	SpaceshipMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 	PawnMovementComp = CreateDefaultSubobject<UFloatingPawnMovement>("Pawn Movement Component");
 
@@ -43,17 +47,8 @@ void ASpaceship::BeginPlay()
 		if(UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
 		{
 			Subsystem->AddMappingContext(SpaceshipMappingContext,0);
-		}
-		
-	}
-	
-}
-
-// Called every frame
-void ASpaceship::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
+		}		
+	}	
 }
 
 // Called to bind functionality to input
@@ -95,13 +90,54 @@ void ASpaceship::Fire(const FInputActionValue& Value)
 	SpawnParameters.Instigator = this;
 
 	GetWorld()->SpawnActor<ABullet>(BulletToSpawn,BulletSpawnTransform.GetLocation(), BulletSpawnTransform.Rotator(),SpawnParameters);
+
+	if(FireSound)
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, FireSound,BulletSpawnTransform.GetLocation());
+	}
 }
 
-float ASpaceship::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator,
-	AActor* DamageCauser)
+void ASpaceship::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	UE_LOG(LogTemp,Warning, TEXT("DEAD"));
-	
-	return Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+	if(OtherActor)
+	{
+		UE_LOG(LogTemp,Warning, TEXT("DEAD Collision"));
+
+		if(!OtherActor->IsPendingKillPending())
+		{
+			OtherActor->Destroy();			
+		}
+
+		OnDeathHandler();
+	}
+}
+
+void ASpaceship::OnDeathHandler()
+{
+	DisableInput(nullptr);
+	RootComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	SetActorHiddenInGame(true);
+
+	if(ExplosionSound)
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, ExplosionSound,GetActorLocation());
+	}
+	if(ExplosionParticle)
+	{
+		UGameplayStatics::SpawnEmitterAtLocation(this, ExplosionParticle, GetActorLocation());
+	}		
+
+	if(const auto GM = Cast<AUEAsteroidsCloneGameModeBase>(UGameplayStatics::GetGameMode(this)))
+	{
+		GM->PlayerDead();
+	}
+}
+
+void ASpaceship::OnRetryHandler()
+{
+	SetActorHiddenInGame(false);
+	EnableInput(UGameplayStatics::GetPlayerController(this, 0));
+	RootComp->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 }
 

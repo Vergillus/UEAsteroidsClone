@@ -10,6 +10,7 @@ class USphereComponent;
 class UStaticMeshComponent;
 class UProjectileMovementComponent;
 class UAsteroidDataAsset;
+class UScreenWarper;
 
 UCLASS()
 class UEASTEROIDSCLONE_API AAsteroid : public AActor
@@ -25,6 +26,9 @@ class UEASTEROIDSCLONE_API AAsteroid : public AActor
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UProjectileMovementComponent> MovementComponent;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UScreenWarper> ScreenWarperComp;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta=( AllowPrivateAccess = "true"))
 	UAsteroidDataAsset* DataAsset;
 	
@@ -34,9 +38,25 @@ public:
 
 	void InitializeAsteroid(UAsteroidDataAsset* Data);
 
-protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
+protected:	
 
-	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;	
+	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category= "Movement")
+	float AsteroidMinSpeed;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category= "Movement")
+	float AsteroidMaxSpeed;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category= "Movement")
+	float RandomRotationInDeg;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	float Lifetime;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category= "VFX")
+	TObjectPtr<UParticleSystem> DeadParticle;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category= "VFX")
+	TObjectPtr<USoundBase> ExplosionSound;
 };
