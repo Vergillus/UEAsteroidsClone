@@ -14,6 +14,7 @@ class UFloatingPawnMovement;
 class UInputMappingContext;
 class UScreenWarper;
 class ABullet;
+class UNiagaraComponent;
 
 UCLASS()
 class UEASTEROIDSCLONE_API ASpaceship : public APawn
@@ -38,6 +39,9 @@ class UEASTEROIDSCLONE_API ASpaceship : public APawn
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UAudioComponent> ShipAudioComponent;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UNiagaraComponent> SpaceshipThrusterNiagaraComponent;
 
 #pragma endregion 
 

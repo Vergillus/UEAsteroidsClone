@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "UEAsteroidsClone/Public/Spaceship.h"
+#include "Spaceship.h"
 
 #include "Components/SphereComponent.h"
 #include "GameFramework/FloatingPawnMovement.h"
@@ -15,6 +15,8 @@
 #include "UEAsteroidsClone/UEAsteroidsCloneGameModeBase.h"
 
 #include "UEAsteroidsClone/Public/Bullet.h"
+
+#include "Niagara/Public/NiagaraComponent.h"
 
 // Sets default values
 ASpaceship::ASpaceship() :
@@ -37,7 +39,10 @@ ASpaceship::ASpaceship() :
 	ScreenWarperComp = CreateDefaultSubobject<UScreenWarper>(TEXT("Screen Warper"));
 
 	ShipAudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("Audio Component"));
-	ShipAudioComponent->bAutoActivate = false;	
+	ShipAudioComponent->bAutoActivate = false;
+
+	SpaceshipThrusterNiagaraComponent = CreateDefaultSubobject<UNiagaraComponent>(TEXT("Thruster Particle"));
+	SpaceshipThrusterNiagaraComponent->SetupAttachment(RootComponent);
 
 }
 
@@ -77,6 +82,7 @@ void ASpaceship::Move(const FInputActionValue& Value)
 
 	if(!ShipAudioComponent->IsPlaying())
 	{
+		SpaceshipThrusterNiagaraComponent->ActivateSystem();
 		ShipAudioComponent->Play();				
 	}	
 }
@@ -85,6 +91,7 @@ void ASpaceship::MoveEnd(const FInputActionValue& Value)
 {
 	if (ShipAudioComponent->IsPlaying())
 	{
+		SpaceshipThrusterNiagaraComponent->DeactivateImmediate();
 		ShipAudioComponent->Stop();
 	}
 }
