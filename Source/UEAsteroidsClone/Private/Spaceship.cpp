@@ -9,6 +9,7 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "ScreenWarper.h"
+#include "Components/AudioComponent.h"
 #include "Components/InputComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "UEAsteroidsClone/UEAsteroidsCloneGameModeBase.h"
@@ -35,6 +36,9 @@ ASpaceship::ASpaceship() :
 
 	ScreenWarperComp = CreateDefaultSubobject<UScreenWarper>(TEXT("Screen Warper"));
 
+	ShipAudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("Audio Component"));
+	ShipAudioComponent->bAutoActivate = false;	
+
 }
 
 // Called when the game starts or when spawned
@@ -59,6 +63,7 @@ void ASpaceship::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 	if(UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent))
 	{
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ASpaceship::Move);
+		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Completed, this, &ASpaceship::MoveEnd);
 		EnhancedInputComponent->BindAction(RotateAction, ETriggerEvent::Triggered, this, &ASpaceship::RotateShip);
 		EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Started, this, &ASpaceship::Fire);
 		
@@ -69,6 +74,19 @@ void ASpaceship::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 void ASpaceship::Move(const FInputActionValue& Value)
 {
 	PawnMovementComp->AddInputVector(GetActorForwardVector());
+
+	if(!ShipAudioComponent->IsPlaying())
+	{
+		ShipAudioComponent->Play();				
+	}	
+}
+
+void ASpaceship::MoveEnd(const FInputActionValue& Value)
+{
+	if (ShipAudioComponent->IsPlaying())
+	{
+		ShipAudioComponent->Stop();
+	}
 }
 
 void ASpaceship::RotateShip(const FInputActionValue& Value)
@@ -89,7 +107,10 @@ void ASpaceship::Fire(const FInputActionValue& Value)
 	SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 	SpawnParameters.Instigator = this;
 
-	GetWorld()->SpawnActor<ABullet>(BulletToSpawn,BulletSpawnTransform.GetLocation(), BulletSpawnTransform.Rotator(),SpawnParameters);
+	if(ABullet* BulletClone = GetWorld()->SpawnActor<ABullet>(BulletToSpawn,BulletSpawnTransform.GetLocation(), BulletSpawnTransform.Rotator(),SpawnParameters))
+	{
+		BulletClone->Tags.Add(PlayerBulletTagName);
+	}
 
 	if(FireSound)
 	{
@@ -100,6 +121,8 @@ void ASpaceship::Fire(const FInputActionValue& Value)
 void ASpaceship::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+	if(OtherActor->ActorHasTag(PlayerBulletTagName)) return;
+	
 	if(OtherActor)
 	{
 		UE_LOG(LogTemp,Warning, TEXT("DEAD Collision"));
@@ -115,9 +138,14 @@ void ASpaceship::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor
 
 void ASpaceship::OnDeathHandler()
 {
+	if(ShipAudioComponent->IsPlaying())
+	{
+		ShipAudioComponent->Stop();
+	}
+	
 	DisableInput(nullptr);
 	RootComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	SetActorHiddenInGame(true);
+	SetActorHiddenInGame(true);	
 
 	if(ExplosionSound)
 	{

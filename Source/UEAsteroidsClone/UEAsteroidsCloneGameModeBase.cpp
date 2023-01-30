@@ -154,7 +154,7 @@ void AUEAsteroidsCloneGameModeBase::PlayerDead()
 		Asteroid->Destroy();
 	}
 
-	if(PlayerCurrentRetryAmount < PlayerTotalRetryAmount)
+	if(PlayerCurrentRetryAmount <= PlayerTotalRetryAmount)
 	{
 		GetWorldTimerManager().SetTimer(PlayerRetryTimerHandle, this, &AUEAsteroidsCloneGameModeBase::PlayerRetryTimerElapsed,PlayerRetryDelay);			
 	}

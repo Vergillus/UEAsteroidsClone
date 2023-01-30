@@ -36,10 +36,15 @@ class UEASTEROIDSCLONE_API ASpaceship : public APawn
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UScreenWarper> ScreenWarperComp;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UAudioComponent> ShipAudioComponent;
+
 #pragma endregion 
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"));
 	float RotationSpeed;
+
+	const FName PlayerBulletTagName = "PlayerBullet";
 	
 public:
 	// Sets default values for this pawn's properties
@@ -67,6 +72,9 @@ protected:
 	void Move(const FInputActionValue& Value);
 
 	UFUNCTION(BlueprintCallable)
+	void MoveEnd(const FInputActionValue& Value);
+
+	UFUNCTION(BlueprintCallable)
 	void RotateShip(const FInputActionValue& Value);
 
 	void Fire(const FInputActionValue& Value);
@@ -84,9 +92,10 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category= "VFX | Sound")
 	TObjectPtr<USoundBase> ExplosionSound;
-
+	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category= "VFX | Particle")
 	TObjectPtr<UParticleSystem> ExplosionParticle;
+
 
 	UFUNCTION()
 	void OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
