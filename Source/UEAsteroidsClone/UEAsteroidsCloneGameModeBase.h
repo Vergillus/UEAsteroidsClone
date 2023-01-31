@@ -99,7 +99,7 @@ public:
 
 	/* Spawns given number of  asteroid(s) at given position */	
 	UFUNCTION(BlueprintCallable)
-	void SpawnAsteroidAtPosition(UAsteroidDataAsset* AsteroidData, FVector SpawnPosition ,int Amount = 1);
+	void SpawnAsteroidAtPosition(EAsteroidType AsteroidType, FVector SpawnPosition ,int Amount = 1);
 
 	UFUNCTION(BlueprintCallable)
 	UAsteroidDataAsset* GetAsteroidDataByType(EAsteroidType AsteroidType) const;

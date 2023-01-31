@@ -43,11 +43,18 @@ void AUEAsteroidsCloneGameModeBase::SpawnAsteroid(UAsteroidDataAsset* AsteroidDa
 	}
 }
 
-void AUEAsteroidsCloneGameModeBase::SpawnAsteroidAtPosition(UAsteroidDataAsset* AsteroidData, FVector SpawnPosition,
+void AUEAsteroidsCloneGameModeBase::SpawnAsteroidAtPosition(EAsteroidType AsteroidType, FVector SpawnPosition,
 	int Amount)
 {
 	FActorSpawnParameters SpawnParameters;
 	SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+	UAsteroidDataAsset* AsteroidData =  GetAsteroidDataByType(AsteroidType);
+
+	if(AsteroidData == nullptr)
+	{
+		return;
+	}
 
 	FTransform SpawnTransform;	
 	SpawnTransform.SetScale3D(FVector::One() * AsteroidData->UniformScale);
