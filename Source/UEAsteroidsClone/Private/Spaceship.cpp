@@ -21,6 +21,7 @@
 // Sets default values
 ASpaceship::ASpaceship() :
 	RotationSpeed(100.0f),
+	BulletSpeed(2000),
 	BulletSpawnSocketName("BulletSpawnLoc")
 {
  	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
@@ -112,11 +113,12 @@ void ASpaceship::Fire(const FInputActionValue& Value)
 
 	FActorSpawnParameters SpawnParameters;
 	SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	SpawnParameters.Instigator = this;
+	SpawnParameters.Owner = this;
 
 	if(ABullet* BulletClone = GetWorld()->SpawnActor<ABullet>(BulletToSpawn,BulletSpawnTransform.GetLocation(), BulletSpawnTransform.Rotator(),SpawnParameters))
 	{
 		BulletClone->Tags.Add(PlayerBulletTagName);
+		BulletClone->InitializeBullet(GetActorForwardVector() * BulletSpeed);
 	}
 
 	if(FireSound)

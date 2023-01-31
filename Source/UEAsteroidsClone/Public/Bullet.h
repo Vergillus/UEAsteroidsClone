@@ -35,10 +35,13 @@ public:
 	UFUNCTION()
 	void OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
-protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
+	FORCEINLINE TObjectPtr<USphereComponent> GetRootCollider() const { return RootComp;}
 
+	UFUNCTION(BlueprintCallable)
+	void InitializeBullet(FVector Velocity);
+
+protected:
+	
 	UPROPERTY(EditDefaultsOnly)
 	float LifeTime;
 };

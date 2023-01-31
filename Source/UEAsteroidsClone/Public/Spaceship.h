@@ -48,6 +48,9 @@ class UEASTEROIDSCLONE_API ASpaceship : public APawn
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"));
 	float RotationSpeed;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"));
+	float BulletSpeed;
+
 	const FName PlayerBulletTagName = "PlayerBullet";
 	
 public:

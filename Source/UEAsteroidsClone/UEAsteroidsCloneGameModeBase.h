@@ -10,6 +10,8 @@
 
 class UAsteroidDataAsset;
 class UMainHUDWidget;
+class UUFODataAsset;
+class AEnemyUFO;
 
 UENUM(BlueprintType)
 enum class ESpawnDirections : uint8
@@ -56,9 +58,15 @@ protected:
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<AAsteroid> AsteroidToSpawn;	
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<AEnemyUFO> UFOToSpawn;	
 	
 	UPROPERTY(EditAnywhere)
 	TArray<UAsteroidDataAsset*> AsteroidsDataArray;
+
+	UPROPERTY(EditAnywhere)
+	TArray<UUFODataAsset*> UFODataArray;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category= "UI")
 	TSubclassOf<UMainHUDWidget> MainHUDWidgetToCreate;
@@ -87,13 +95,16 @@ protected:
 	void SpawnAsteroidTimerElapsed();
 
 	UFUNCTION()
-	void PlayerRetryTimerElapsed();
-#pragma endregion 
+	void SpawnUFOTimerElapsed();
 
-	
-	// TODO: UFO Spawner timer
+	UFUNCTION()
+	void PlayerRetryTimerElapsed();
+#pragma endregion
 
 	FVector GetRandomSpawnPoint() const;
+
+	UFUNCTION(BlueprintCallable)
+	void SpawnUFO();
 
 public:
 
@@ -101,10 +112,11 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SpawnAsteroid(UAsteroidDataAsset* AsteroidData) const;
 
-	/* Spawns given number of  asteroid(s) at given position */	
+	/* Spawns given number of  asteroid(s) at given position. Called via Asteroid when it is dead */	
 	UFUNCTION(BlueprintCallable)
 	void SpawnAsteroidAtPosition(EAsteroidType AsteroidType, FVector SpawnPosition ,int Amount = 1);
 
+	/** Returns Asteroid Data Asset by AsteroidType */
 	UFUNCTION(BlueprintCallable)
 	UAsteroidDataAsset* GetAsteroidDataByType(EAsteroidType AsteroidType) const;
 

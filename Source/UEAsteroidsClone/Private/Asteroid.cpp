@@ -42,10 +42,11 @@ void AAsteroid::InitializeAsteroid(UAsteroidDataAsset* Data)
 	
 	DataAsset = Data;
 
+	// Get random facing direction
 	FVector Direction = (FVector::Zero() - GetActorLocation()).GetSafeNormal();	
-	
 	Direction = Direction.RotateAngleAxis(FMath::RandRange(-RandomRotationInDeg, RandomRotationInDeg), FVector::UpVector);
 
+	// Rotate so that forward vector of the object facing the random facing direction
 	SetActorRotation(UKismetMathLibrary::FindLookAtRotation(GetActorForwardVector(), Direction));
 
 	MovementComponent->Velocity = GetActorForwardVector() * FMath::RandRange(AsteroidMinSpeed, AsteroidMaxSpeed);	

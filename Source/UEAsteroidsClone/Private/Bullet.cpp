@@ -29,19 +29,18 @@ ABullet::ABullet() :
 
 }
 
-// Called when the game starts or when spawned
-void ABullet::BeginPlay()
+void ABullet::InitializeBullet(FVector Velocity)
 {
-	Super::BeginPlay();
-
 	SetLifeSpan(LifeTime);
-	
+
+	ProjectileMovementComponent->Velocity = Velocity;
 }
+
 
 void ABullet::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if(OtherActor && OtherActor != this && OtherActor != GetInstigator())
+	if(OtherActor && OtherActor != this && OtherActor != GetOwner())
 	{		
 		OtherActor->TakeDamage(0,FDamageEvent(UDamageType::StaticClass()),UGameplayStatics::GetPlayerController(this, 0),this);
 		Destroy();

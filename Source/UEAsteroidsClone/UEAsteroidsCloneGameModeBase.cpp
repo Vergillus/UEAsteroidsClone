@@ -3,11 +3,13 @@
 
 #include "UEAsteroidsCloneGameModeBase.h"
 
+#include "EnemyUFO.h"
 #include "Spaceship.h"
 #include "Blueprint/UserWidget.h"
 #include "Kismet/GameplayStatics.h"
 
 #include "MainHUDWidget.h"
+#include "UFODataAsset.h"
 
 
 AUEAsteroidsCloneGameModeBase::AUEAsteroidsCloneGameModeBase() :
@@ -30,9 +32,27 @@ void AUEAsteroidsCloneGameModeBase::BeginPlay()
 		MainHUDWidgetRef->AddToViewport();
 	}
 
-	constexpr  float InFirstDelay = 1.0f;
-	GetWorldTimerManager().SetTimer(AsteroidSpawnTimerHandle,this,&AUEAsteroidsCloneGameModeBase::SpawnAsteroidTimerElapsed,AsteroidSpawnInterval, true, InFirstDelay);
+	if(AsteroidToSpawn)
+	{
+		constexpr  float InFirstDelay = 1.0f;
+		GetWorldTimerManager().SetTimer(AsteroidSpawnTimerHandle,this,&AUEAsteroidsCloneGameModeBase::SpawnAsteroidTimerElapsed,AsteroidSpawnInterval, true, InFirstDelay);		
+	}
+
+	if(UFOToSpawn)
+	{
+		GetWorldTimerManager().SetTimer(UFOSpawnTimerHandle, this, &AUEAsteroidsCloneGameModeBase::SpawnUFOTimerElapsed, UFOSpawnInterval, true);		
+	}
 	
+}
+
+void AUEAsteroidsCloneGameModeBase::SpawnAsteroidTimerElapsed()
+{
+	SpawnAsteroid(AsteroidsDataArray[FMath::RandRange(0, AsteroidsDataArray.Num() - 1)]);
+}
+
+void AUEAsteroidsCloneGameModeBase::SpawnUFOTimerElapsed()
+{
+	SpawnUFO();
 }
 
 void AUEAsteroidsCloneGameModeBase::SpawnAsteroid(UAsteroidDataAsset* AsteroidData) const
@@ -83,10 +103,25 @@ void AUEAsteroidsCloneGameModeBase::SpawnAsteroidAtPosition(EAsteroidType Astero
 	}
 }
 
-void AUEAsteroidsCloneGameModeBase::SpawnAsteroidTimerElapsed()
+
+void AUEAsteroidsCloneGameModeBase::SpawnUFO()
 {
-	SpawnAsteroid(AsteroidsDataArray[FMath::RandRange(0, AsteroidsDataArray.Num() - 1)]);
+	FActorSpawnParameters SpawnParameters;
+	SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+	UUFODataAsset* UFOData = UFODataArray[FMath::RandRange(0, UFODataArray.Num() - 1)];
+
+	FTransform SpawnTransform;
+	SpawnTransform.SetLocation(GetRandomSpawnPoint());
+	SpawnTransform.SetScale3D(FVector::One() * UFOData->UniformScale);
+	SpawnTransform.SetRotation(FRotator::ZeroRotator.Quaternion());
+
+	if (const auto UFOClone = GetWorld()->SpawnActor<AEnemyUFO>(UFOToSpawn,SpawnTransform,SpawnParameters))
+	{
+		UFOClone->InitializeUFO(UFOData);
+	}
 }
+
 
 FVector AUEAsteroidsCloneGameModeBase::GetRandomSpawnPoint() const
 {
@@ -162,8 +197,11 @@ void AUEAsteroidsCloneGameModeBase::PlayerDead()
 {
 	PlayerCurrentRetryAmount++;
 
-	// Stop Asteroid Spawn timer routine.
-	GetWorldTimerManager().ClearTimer(AsteroidSpawnTimerHandle);	
+	// Stop Asteroid Spawn timer.
+	GetWorldTimerManager().ClearTimer(AsteroidSpawnTimerHandle);
+
+	// Stop UFO Spawn timer.
+	GetWorldTimerManager().ClearTimer(UFOSpawnTimerHandle);
 
 	// Find and destroy all asteroids in the world
 	//-----------------------------------------------
@@ -175,6 +213,17 @@ void AUEAsteroidsCloneGameModeBase::PlayerDead()
 		Asteroid->Destroy();
 	}
 	//-----------------------------------------------
+
+	// Find and destroy all UFO(s) in the world
+	//-----------------------------------------------
+	TArray<AActor*> UFOs;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(),AEnemyUFO::StaticClass(), UFOs);
+	for (const auto UFO : UFOs)
+	{
+		UFO->Destroy();
+	}
+	//-----------------------------------------------
+	
 	
 	// Notify UI that player is dead
 	if(MainHUDWidgetRef)
@@ -204,7 +253,11 @@ void AUEAsteroidsCloneGameModeBase::PlayerRetryTimerElapsed()
 		PlayerPawn->SetActorLocation(FVector::ZeroVector);
 		PlayerPawn->OnRetryHandler();
 
-		GetWorldTimerManager().SetTimer(AsteroidSpawnTimerHandle,this,&AUEAsteroidsCloneGameModeBase::SpawnAsteroidTimerElapsed,AsteroidSpawnInterval, true);	
+		// Restart asteroid spawn timer
+		GetWorldTimerManager().SetTimer(AsteroidSpawnTimerHandle,this,&AUEAsteroidsCloneGameModeBase::SpawnAsteroidTimerElapsed,AsteroidSpawnInterval, true);
+
+		// Restart UFO spawn timer
+		GetWorldTimerManager().SetTimer(UFOSpawnTimerHandle,this,&AUEAsteroidsCloneGameModeBase::SpawnUFOTimerElapsed,UFOSpawnInterval, true);
 	}	
 }
 
