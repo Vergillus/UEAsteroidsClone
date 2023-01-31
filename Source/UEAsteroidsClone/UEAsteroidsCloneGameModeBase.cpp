@@ -3,6 +3,7 @@
 
 #include "UEAsteroidsCloneGameModeBase.h"
 
+#include "Bullet.h"
 #include "EnemyUFO.h"
 #include "Spaceship.h"
 #include "Blueprint/UserWidget.h"
@@ -47,7 +48,7 @@ void AUEAsteroidsCloneGameModeBase::BeginPlay()
 
 void AUEAsteroidsCloneGameModeBase::SpawnAsteroidTimerElapsed()
 {
-	SpawnAsteroid(AsteroidsDataArray[FMath::RandRange(0, AsteroidsDataArray.Num() - 1)]);
+	SpawnAsteroid();
 }
 
 void AUEAsteroidsCloneGameModeBase::SpawnUFOTimerElapsed()
@@ -55,10 +56,12 @@ void AUEAsteroidsCloneGameModeBase::SpawnUFOTimerElapsed()
 	SpawnUFO();
 }
 
-void AUEAsteroidsCloneGameModeBase::SpawnAsteroid(UAsteroidDataAsset* AsteroidData) const
+void AUEAsteroidsCloneGameModeBase::SpawnAsteroid() const
 {
 	FActorSpawnParameters SpawnParameters;
 	SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+	const auto AsteroidData = AsteroidsDataArray[FMath::RandRange(0, AsteroidsDataArray.Num() - 1)];
 
 	FTransform SpawnTransform;
 	SpawnTransform.SetLocation(GetRandomSpawnPoint());
@@ -193,6 +196,40 @@ UAsteroidDataAsset* AUEAsteroidsCloneGameModeBase::GetAsteroidDataByType(EAstero
 	return Data;
 }
 
+void AUEAsteroidsCloneGameModeBase::ResetScene() const
+{
+	// Find and destroy all asteroids in the world
+	//-----------------------------------------------
+	TArray<AActor*> SpawnedActors;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(),AAsteroid::StaticClass(),SpawnedActors);
+
+	for(const auto Asteroid : SpawnedActors)
+	{
+		Asteroid->Destroy();
+	}
+	//-----------------------------------------------
+
+	// Find and destroy all UFO(s) in the world
+	//-----------------------------------------------
+	SpawnedActors.Empty();
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(),AEnemyUFO::StaticClass(), SpawnedActors);
+	for (const auto UFO : SpawnedActors)
+	{
+		UFO->Destroy();
+	}
+	//-----------------------------------------------
+	
+	// Find and destroy all Bullet(s) in the world
+	//-----------------------------------------------
+	SpawnedActors.Empty();
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(),ABullet::StaticClass(), SpawnedActors);
+	for (const auto Bullet : SpawnedActors)
+	{
+		Bullet->Destroy();
+	}
+	//-----------------------------------------------
+}
+
 void AUEAsteroidsCloneGameModeBase::PlayerDead()
 {
 	PlayerCurrentRetryAmount++;
@@ -203,27 +240,7 @@ void AUEAsteroidsCloneGameModeBase::PlayerDead()
 	// Stop UFO Spawn timer.
 	GetWorldTimerManager().ClearTimer(UFOSpawnTimerHandle);
 
-	// Find and destroy all asteroids in the world
-	//-----------------------------------------------
-	TArray<AActor*> Asteroids;
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(),AAsteroid::StaticClass(),Asteroids);
-
-	for(const auto Asteroid : Asteroids)
-	{
-		Asteroid->Destroy();
-	}
-	//-----------------------------------------------
-
-	// Find and destroy all UFO(s) in the world
-	//-----------------------------------------------
-	TArray<AActor*> UFOs;
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(),AEnemyUFO::StaticClass(), UFOs);
-	for (const auto UFO : UFOs)
-	{
-		UFO->Destroy();
-	}
-	//-----------------------------------------------
-	
+	ResetScene();	
 	
 	// Notify UI that player is dead
 	if(MainHUDWidgetRef)

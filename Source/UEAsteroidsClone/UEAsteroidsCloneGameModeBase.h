@@ -103,14 +103,15 @@ protected:
 
 	FVector GetRandomSpawnPoint() const;
 
-	UFUNCTION(BlueprintCallable)
-	void SpawnUFO();
-
-public:
-
 	/* Spawns asteroids at random positions */
 	UFUNCTION(BlueprintCallable)
-	void SpawnAsteroid(UAsteroidDataAsset* AsteroidData) const;
+	void SpawnAsteroid() const;
+
+	/** Spawn UFO at random position */
+	UFUNCTION(BlueprintCallable)
+	void SpawnUFO();
+	
+public:	
 
 	/* Spawns given number of  asteroid(s) at given position. Called via Asteroid when it is dead */	
 	UFUNCTION(BlueprintCallable)
@@ -119,6 +120,10 @@ public:
 	/** Returns Asteroid Data Asset by AsteroidType */
 	UFUNCTION(BlueprintCallable)
 	UAsteroidDataAsset* GetAsteroidDataByType(EAsteroidType AsteroidType) const;
+
+	/** Resets the scene by removing all spawned objects in the world. */
+	UFUNCTION(BlueprintCallable)
+	void ResetScene() const;
 
 	/* Called via player ship when it is dead **/
 	UFUNCTION(BlueprintCallable)
