@@ -4,11 +4,14 @@
 #include "UEAsteroidsCloneGameModeBase.h"
 
 #include "Spaceship.h"
+#include "Blueprint/UserWidget.h"
 #include "Kismet/GameplayStatics.h"
 
-int32 AUEAsteroidsCloneGameModeBase::Score = 0;
+#include "MainHUDWidget.h"
+
 
 AUEAsteroidsCloneGameModeBase::AUEAsteroidsCloneGameModeBase() :
+	Score(0),
 	PlayerCurrentRetryAmount(0),
 	AsteroidSpawnInterval(1),
 	UFOSpawnInterval(1),
@@ -19,8 +22,13 @@ AUEAsteroidsCloneGameModeBase::AUEAsteroidsCloneGameModeBase() :
 
 void AUEAsteroidsCloneGameModeBase::BeginPlay()
 {
-	Score = 0;
 	Super::BeginPlay();
+
+	if(MainHUDWidgetToCreate)
+	{
+		MainHUDWidgetRef = CreateWidget<UMainHUDWidget>(GetWorld(), MainHUDWidgetToCreate);
+		MainHUDWidgetRef->AddToViewport();
+	}
 
 	constexpr  float InFirstDelay = 1.0f;
 	GetWorldTimerManager().SetTimer(AsteroidSpawnTimerHandle,this,&AUEAsteroidsCloneGameModeBase::SpawnAsteroidTimerElapsed,AsteroidSpawnInterval, true, InFirstDelay);
@@ -126,11 +134,13 @@ void AUEAsteroidsCloneGameModeBase::SetScore(const int32 Value)
 {
 	if(Value <= 0) return;
 	
-	Score += Value;
+	Score += Value;	
 
-	UE_LOG(LogTemp, Warning, TEXT("Score : %i"), Score);
-
-	// TODO: Broadcast score changed event
+	// Notify UI that the score is changed.
+	if(MainHUDWidgetRef)
+	{
+		MainHUDWidgetRef->ScoreChanged(Score);		
+	}
 }
 
 UAsteroidDataAsset* AUEAsteroidsCloneGameModeBase::GetAsteroidDataByType(EAsteroidType AsteroidType) const
@@ -151,8 +161,12 @@ UAsteroidDataAsset* AUEAsteroidsCloneGameModeBase::GetAsteroidDataByType(EAstero
 void AUEAsteroidsCloneGameModeBase::PlayerDead()
 {
 	PlayerCurrentRetryAmount++;
+
+	// Stop Asteroid Spawn timer routine.
 	GetWorldTimerManager().ClearTimer(AsteroidSpawnTimerHandle);	
-	
+
+	// Find and destroy all asteroids in the world
+	//-----------------------------------------------
 	TArray<AActor*> Asteroids;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(),AAsteroid::StaticClass(),Asteroids);
 
@@ -160,15 +174,25 @@ void AUEAsteroidsCloneGameModeBase::PlayerDead()
 	{
 		Asteroid->Destroy();
 	}
+	//-----------------------------------------------
+	
+	// Notify UI that player is dead
+	if(MainHUDWidgetRef)
+	{
+		MainHUDWidgetRef->PlayerDead(PlayerCurrentRetryAmount);
+	}		
 
-	if(PlayerCurrentRetryAmount <= PlayerTotalRetryAmount)
+	if(PlayerCurrentRetryAmount < PlayerTotalRetryAmount) // Check if the player has enough retry points;
 	{
-		GetWorldTimerManager().SetTimer(PlayerRetryTimerHandle, this, &AUEAsteroidsCloneGameModeBase::PlayerRetryTimerElapsed,PlayerRetryDelay);			
+		// Restore player after some delay
+		GetWorldTimerManager().SetTimer(PlayerRetryTimerHandle, this, &AUEAsteroidsCloneGameModeBase::PlayerRetryTimerElapsed,PlayerRetryDelay);		
 	}
-	else
+	else // Game over
 	{
-		//TODO: Show game over UI
-		UE_LOG(LogTemp,Warning,TEXT("GAME OVER __ Score %i"), Score);
+		if(MainHUDWidgetRef)
+		{
+			MainHUDWidgetRef->GameOver(Score);
+		}		
 	}
 }
 
@@ -176,6 +200,7 @@ void AUEAsteroidsCloneGameModeBase::PlayerRetryTimerElapsed()
 {
 	if(ASpaceship* PlayerPawn = Cast<ASpaceship>(UGameplayStatics::GetPlayerPawn(this,0)))
 	{
+		PlayerPawn->SetActorRotation(FQuat::Identity);
 		PlayerPawn->SetActorLocation(FVector::ZeroVector);
 		PlayerPawn->OnRetryHandler();
 

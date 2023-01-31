@@ -9,6 +9,7 @@
 #include "UEAsteroidsCloneGameModeBase.generated.h"
 
 class UAsteroidDataAsset;
+class UMainHUDWidget;
 
 UENUM(BlueprintType)
 enum class ESpawnDirections : uint8
@@ -29,14 +30,13 @@ class UEASTEROIDSCLONE_API AUEAsteroidsCloneGameModeBase : public AGameModeBase
 {
 	GENERATED_BODY()
 
-	static int32 Score;
-	
+	int32 Score;	
 
 public:
 
 	AUEAsteroidsCloneGameModeBase();
 
-	static void SetScore(const int32 Value);
+	void SetScore(const int32 Value);
 
 protected:
 
@@ -59,6 +59,12 @@ protected:
 	
 	UPROPERTY(EditAnywhere)
 	TArray<UAsteroidDataAsset*> AsteroidsDataArray;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category= "UI")
+	TSubclassOf<UMainHUDWidget> MainHUDWidgetToCreate;
+
+	UPROPERTY(BlueprintReadOnly)
+	TObjectPtr<UMainHUDWidget> MainHUDWidgetRef;
 
 	const TArray<ESpawnDirections> SpawnDirections
 	{
@@ -86,8 +92,6 @@ protected:
 
 	
 	// TODO: UFO Spawner timer
-	// TODO: UI events
-	
 
 	FVector GetRandomSpawnPoint() const;
 

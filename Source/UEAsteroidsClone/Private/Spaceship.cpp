@@ -132,8 +132,6 @@ void ASpaceship::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor
 	
 	if(OtherActor)
 	{
-		UE_LOG(LogTemp,Warning, TEXT("DEAD Collision"));
-
 		if(!OtherActor->IsPendingKillPending())
 		{
 			OtherActor->Destroy();			
@@ -148,11 +146,14 @@ void ASpaceship::OnDeathHandler()
 	if(ShipAudioComponent->IsPlaying())
 	{
 		ShipAudioComponent->Stop();
+		SpaceshipThrusterNiagaraComponent->DeactivateImmediate();
 	}
 	
 	DisableInput(nullptr);
 	RootComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	SetActorHiddenInGame(true);	
+	SetActorHiddenInGame(true);
+
+	PawnMovementComp->StopMovementImmediately();
 
 	if(ExplosionSound)
 	{

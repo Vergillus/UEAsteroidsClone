@@ -57,22 +57,19 @@ float AAsteroid::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent,
 
 	if(DataAsset)
 	{
-		AUEAsteroidsCloneGameModeBase::SetScore(DataAsset->ReceivedScore);
+		if(const auto GM = Cast<AUEAsteroidsCloneGameModeBase>(UGameplayStatics::GetGameMode(this)))
+		{
+			GM->SetScore(DataAsset->ReceivedScore);
 
-		if (DataAsset->AsteroidType == EAsteroidType::EAT_Large)
-		{
-			if(const auto GM = Cast<AUEAsteroidsCloneGameModeBase>(UGameplayStatics::GetGameMode(this)))
+			if (DataAsset->AsteroidType == EAsteroidType::EAT_Large)
 			{
-				GM->SpawnAsteroidAtPosition(EAsteroidType::EAT_Medium, GetActorLocation());
+				GM->SpawnAsteroidAtPosition(EAsteroidType::EAT_Medium, GetActorLocation());				
 			}
-		}
-		else if (DataAsset->AsteroidType == EAsteroidType::EAT_Medium)
-		{
-			if(const auto GM = Cast<AUEAsteroidsCloneGameModeBase>(UGameplayStatics::GetGameMode(this)))
+			else if (DataAsset->AsteroidType == EAsteroidType::EAT_Medium)
 			{
 				GM->SpawnAsteroidAtPosition(EAsteroidType::EAT_Small, GetActorLocation(), 2);
-			}
-		}	
+			}		
+		}
 	}
 
 	if(DeadParticle)
