@@ -11,8 +11,6 @@ UScreenWarper::UScreenWarper()
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
-
-	// ...
 }
 
 
@@ -21,8 +19,17 @@ void UScreenWarper::BeginPlay()
 {
 	Super::BeginPlay();
 
-	PlayerController = UGameplayStatics::GetPlayerController(GetOwner(),0);
-	PlayerController->GetViewportSize(ViewportSizeX, ViewportSizeY);
+	// Delay PlayerController and viewport sizes initialization to prevent teleporting the spaceship to wrong screen position bug
+	// at the start when playing stand-alone mode.
+	FTimerHandle TimerHandle;
+	FTimerDelegate TimerDelegate;	
+	TimerDelegate.BindLambda([&]
+	{
+		PlayerController = UGameplayStatics::GetPlayerController(GetOwner(),0);
+		PlayerController->GetViewportSize(ViewportSizeX, ViewportSizeY);	
+	});
+
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, TimerDelegate,GetWorld()->DeltaTimeSeconds,false);	
 }
 
 // Called every frame
