@@ -13,11 +13,7 @@
 #include "UEAsteroidsClone/UEAsteroidsCloneGameModeBase.h"
 
 // Sets default values
-AAsteroid::AAsteroid() :
-	AsteroidMinSpeed(800.0f),
-	AsteroidMaxSpeed(1200.0f),
-	RandomRotationInDeg(45),
-	Lifetime(5)
+AAsteroid::AAsteroid()	
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
@@ -38,18 +34,24 @@ AAsteroid::AAsteroid() :
 
 void AAsteroid::InitializeAsteroid(UAsteroidDataAsset* Data)
 {
-	SetLifeSpan(Lifetime);
+	if(!Data)
+	{
+		Destroy();
+		return;
+	}
 	
 	DataAsset = Data;
+	
+	SetLifeSpan(DataAsset->Lifetime);	
 
 	// Get random facing direction
 	FVector Direction = (FVector::Zero() - GetActorLocation()).GetSafeNormal();	
-	Direction = Direction.RotateAngleAxis(FMath::RandRange(-RandomRotationInDeg, RandomRotationInDeg), FVector::UpVector);
+	Direction = Direction.RotateAngleAxis(FMath::RandRange(-DataAsset->RandomRotationInDeg, DataAsset->RandomRotationInDeg), FVector::UpVector);
 
 	// Rotate so that forward vector of the object facing the random facing direction
 	SetActorRotation(UKismetMathLibrary::FindLookAtRotation(GetActorForwardVector(), Direction));
 
-	MovementComponent->Velocity = GetActorForwardVector() * FMath::RandRange(AsteroidMinSpeed, AsteroidMaxSpeed);	
+	MovementComponent->Velocity = GetActorForwardVector() * FMath::RandRange(DataAsset->AsteroidMinSpeed, DataAsset->AsteroidMaxSpeed);	
 }
 
 float AAsteroid::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator,

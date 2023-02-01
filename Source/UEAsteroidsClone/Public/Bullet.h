@@ -38,7 +38,7 @@ public:
 	FORCEINLINE TObjectPtr<USphereComponent> GetRootCollider() const { return RootComp;}
 
 	UFUNCTION(BlueprintCallable)
-	void InitializeBullet(FVector Velocity);
+	void InitializeBullet(FVector Velocity, UMaterialInterface* BulletMat = nullptr);
 
 protected:
 	

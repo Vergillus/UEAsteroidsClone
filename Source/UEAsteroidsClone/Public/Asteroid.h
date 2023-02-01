@@ -41,18 +41,7 @@ public:
 protected:	
 
 	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category= "Movement")
-	float AsteroidMinSpeed;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category= "Movement")
-	float AsteroidMaxSpeed;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category= "Movement")
-	float RandomRotationInDeg;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	float Lifetime;
+	
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category= "VFX")
 	TObjectPtr<UParticleSystem> DeadParticle;

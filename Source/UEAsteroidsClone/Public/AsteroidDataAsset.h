@@ -36,5 +36,17 @@ public:
 	/* Score to receive when asteroid is destroyed */
 	UPROPERTY(EditAnywhere);
 	int32 ReceivedScore;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category= "Movement")
+	float AsteroidMinSpeed;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category= "Movement")
+	float AsteroidMaxSpeed;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category= "Movement")
+	float RandomRotationInDeg;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	float Lifetime;
 	
 };

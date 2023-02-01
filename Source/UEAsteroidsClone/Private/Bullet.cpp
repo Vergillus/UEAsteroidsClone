@@ -29,11 +29,18 @@ ABullet::ABullet() :
 
 }
 
-void ABullet::InitializeBullet(FVector Velocity)
+void ABullet::InitializeBullet(FVector Velocity, UMaterialInterface* BulletMat)
 {
 	SetLifeSpan(LifeTime);
 
 	ProjectileMovementComponent->Velocity = Velocity;
+
+	// Changed bullet material if BulletMat is not null
+	if(BulletMat)
+	{
+		BulletMesh->SetMaterial(0,BulletMat);
+	}
+	
 }
 
 

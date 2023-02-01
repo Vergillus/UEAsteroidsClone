@@ -52,6 +52,9 @@ class UEASTEROIDSCLONE_API ASpaceship : public APawn
 	float BulletSpeed;
 
 	const FName PlayerBulletTagName = "PlayerBullet";
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=( AllowPrivateAccess = "true"))
+	UMaterialInterface* BulletMaterial;
 	
 public:
 	// Sets default values for this pawn's properties

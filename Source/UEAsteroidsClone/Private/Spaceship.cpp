@@ -44,7 +44,6 @@ ASpaceship::ASpaceship() :
 
 	SpaceshipThrusterNiagaraComponent = CreateDefaultSubobject<UNiagaraComponent>(TEXT("Thruster Particle"));
 	SpaceshipThrusterNiagaraComponent->SetupAttachment(RootComponent);
-
 }
 
 // Called when the game starts or when spawned
@@ -118,7 +117,7 @@ void ASpaceship::Fire(const FInputActionValue& Value)
 	if(ABullet* BulletClone = GetWorld()->SpawnActor<ABullet>(BulletToSpawn,BulletSpawnTransform.GetLocation(), BulletSpawnTransform.Rotator(),SpawnParameters))
 	{
 		BulletClone->Tags.Add(PlayerBulletTagName);
-		BulletClone->InitializeBullet(GetActorForwardVector() * BulletSpeed);
+		BulletClone->InitializeBullet(GetActorForwardVector() * BulletSpeed, BulletMaterial);
 	}
 
 	if(FireSound)
