@@ -11,6 +11,7 @@ class UStaticMeshComponent;
 class UProjectileMovementComponent;
 class UAsteroidDataAsset;
 class UScreenWarper;
+class ULifespanController;
 
 UCLASS()
 class UEASTEROIDSCLONE_API AAsteroid : public AActor
@@ -28,6 +29,9 @@ class UEASTEROIDSCLONE_API AAsteroid : public AActor
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UScreenWarper> ScreenWarperComp;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<ULifespanController> LifespanController;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta=( AllowPrivateAccess = "true"))
 	UAsteroidDataAsset* DataAsset;

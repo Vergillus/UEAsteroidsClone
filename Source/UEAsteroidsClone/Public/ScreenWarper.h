@@ -9,6 +9,8 @@
 UENUM()
 enum class EWarpAxis { EWA_X, EWA_Y };
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnActorWarped);
+
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class UEASTEROIDSCLONE_API UScreenWarper : public UActorComponent
 {
@@ -31,11 +33,13 @@ protected:
 
 	FVector WorldLocation, WorldDirection;
 
-	void WarpOwner(EWarpAxis WarpAxis);
+	void WarpOwner(EWarpAxis WarpAxis) const;
 
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
+	UPROPERTY(BlueprintAssignable)
+	FOnActorWarped OnActorWarped;
 		
 };

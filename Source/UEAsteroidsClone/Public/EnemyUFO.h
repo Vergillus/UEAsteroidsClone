@@ -12,11 +12,14 @@ class UProjectileMovementComponent;
 class UScreenWarper;
 class UAudioComponent;
 class UUFODataAsset;
+class ULifespanController;
 
 UCLASS()
 class UEASTEROIDSCLONE_API AEnemyUFO : public AActor
 {
 	GENERATED_BODY()
+
+#pragma region Components
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=( AllowPrivateAccess = "true"))
 	TObjectPtr<USphereComponent> RootComp;
@@ -31,7 +34,11 @@ class UEASTEROIDSCLONE_API AEnemyUFO : public AActor
 	TObjectPtr<UScreenWarper> ScreenWarperComp;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=( AllowPrivateAccess = "true"))
+	TObjectPtr<ULifespanController> LifespanController;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=( AllowPrivateAccess = "true"))
 	TObjectPtr<UAudioComponent> UFOAudioComp;
+#pragma endregion 
 
 	const FName EnemyBulletTagName = "EnemyBullet";
 

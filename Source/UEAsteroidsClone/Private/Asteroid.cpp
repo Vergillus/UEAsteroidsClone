@@ -4,6 +4,7 @@
 #include "Asteroid.h"
 
 #include "AsteroidDataAsset.h"
+#include "LifespanController.h"
 #include "ScreenWarper.h"
 #include "Components/SphereComponent.h"
 #include "Engine/DamageEvents.h"
@@ -30,6 +31,8 @@ AAsteroid::AAsteroid()
 
 	ScreenWarperComp = CreateDefaultSubobject<UScreenWarper>(TEXT("Screen Warper Component"));
 
+	LifespanController = CreateDefaultSubobject<ULifespanController>(TEXT("Lifespawn Controller"));
+
 }
 
 void AAsteroid::InitializeAsteroid(UAsteroidDataAsset* Data)
@@ -41,8 +44,8 @@ void AAsteroid::InitializeAsteroid(UAsteroidDataAsset* Data)
 	}
 	
 	DataAsset = Data;
-	
-	SetLifeSpan(DataAsset->Lifetime);	
+
+	LifespanController->SetLifespan(DataAsset->Lifetime);
 
 	// Get random facing direction
 	FVector Direction = (FVector::Zero() - GetActorLocation()).GetSafeNormal();	

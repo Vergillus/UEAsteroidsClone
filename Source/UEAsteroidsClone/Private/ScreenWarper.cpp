@@ -37,8 +37,7 @@ void UScreenWarper::TickComponent(float DeltaTime, ELevelTick TickType, FActorCo
 		if (ScreenLocation.X > ViewportSizeX)
 		{
 			PlayerController->DeprojectScreenPositionToWorld(0,ViewportSizeY,WorldLocation, WorldDirection);
-			WarpOwner(EWarpAxis::EWA_X);
-			
+			WarpOwner(EWarpAxis::EWA_X);			
 		}
 		else if(ScreenLocation.X < 0)
 		{
@@ -61,7 +60,7 @@ void UScreenWarper::TickComponent(float DeltaTime, ELevelTick TickType, FActorCo
 	// ...
 }
 
-void UScreenWarper::WarpOwner(EWarpAxis WarpAxis)
+void UScreenWarper::WarpOwner(EWarpAxis WarpAxis) const
 {
 	if (WarpAxis == EWarpAxis::EWA_X)
 	{
@@ -72,5 +71,10 @@ void UScreenWarper::WarpOwner(EWarpAxis WarpAxis)
 	{
 		const FVector NewLocation{WorldLocation.X, GetOwner()->GetActorLocation().Y, GetOwner()->GetActorLocation().Z};
 		GetOwner()->SetActorLocation(NewLocation);
+	}
+
+	if(OnActorWarped.IsBound())
+	{
+		OnActorWarped.Broadcast();
 	}
 }

@@ -4,6 +4,7 @@
 #include "EnemyUFO.h"
 
 #include "Bullet.h"
+#include "LifespanController.h"
 #include "ScreenWarper.h"
 #include "UFODataAsset.h"
 #include "Components/AudioComponent.h"
@@ -31,6 +32,8 @@ AEnemyUFO::AEnemyUFO()
 
 	ScreenWarperComp = CreateDefaultSubobject<UScreenWarper>(TEXT("Screen Warper Component"));
 
+	LifespanController = CreateDefaultSubobject<ULifespanController>(TEXT("Lifespan Controller"));
+
 	UFOAudioComp = CreateDefaultSubobject<UAudioComponent>(TEXT("Audio Component"));	
 
 }
@@ -45,7 +48,7 @@ void AEnemyUFO::InitializeUFO(UUFODataAsset* DataAsset)
 	
 	UFOData = DataAsset;
 
-	SetLifeSpan(UFOData->LifeSpan);	
+	LifespanController->SetLifespan(UFOData->LifeSpan);	
 
 	// Get random facing direction
 	FVector Direction = (FVector::Zero() - GetActorLocation()).GetSafeNormal();	
