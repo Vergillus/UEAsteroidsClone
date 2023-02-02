@@ -41,9 +41,6 @@ class UEASTEROIDSCLONE_API AEnemyUFO : public AActor
 #pragma endregion 
 
 	const FName EnemyBulletTagName = "EnemyBullet";
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=( AllowPrivateAccess = "true"))
-	float RandomRotationInDeg;	
 	
 public:	
 	// Sets default values for this actor's properties

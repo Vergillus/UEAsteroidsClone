@@ -21,15 +21,17 @@ void UScreenWarper::BeginPlay()
 
 	// Delay PlayerController and viewport sizes initialization to prevent teleporting the spaceship to wrong screen position bug
 	// at the start when playing stand-alone mode.
+	//--------------------------------------------------------
 	FTimerHandle TimerHandle;
-	FTimerDelegate TimerDelegate;	
+	FTimerDelegate TimerDelegate;
+	constexpr float Delay = 0.1f;
 	TimerDelegate.BindLambda([&]
 	{
 		PlayerController = UGameplayStatics::GetPlayerController(GetOwner(),0);
-		PlayerController->GetViewportSize(ViewportSizeX, ViewportSizeY);	
+		PlayerController->GetViewportSize(ViewportSizeX, ViewportSizeY);		
 	});
-
-	GetWorld()->GetTimerManager().SetTimer(TimerHandle, TimerDelegate,GetWorld()->DeltaTimeSeconds,false);	
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, TimerDelegate,Delay,false);
+	//--------------------------------------------------------	
 }
 
 // Called every frame
@@ -37,6 +39,8 @@ void UScreenWarper::TickComponent(float DeltaTime, ELevelTick TickType, FActorCo
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);	
 
+	// Get the owners screen position and check if it X and/or Y component satisfies the conditions below.
+	// If so teleport the owner to opposite side of the screen
 	if (PlayerController)
 	{
 		PlayerController->ProjectWorldLocationToScreen(GetOwner()->GetActorLocation(), ScreenLocation);		

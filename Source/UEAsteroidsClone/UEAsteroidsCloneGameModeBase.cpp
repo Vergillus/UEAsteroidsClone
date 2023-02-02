@@ -33,13 +33,13 @@ void AUEAsteroidsCloneGameModeBase::BeginPlay()
 		MainHUDWidgetRef->AddToViewport();
 	}
 
-	if(AsteroidToSpawn)
+	if(AsteroidToSpawn && !AsteroidsDataArray.IsEmpty())
 	{
 		constexpr  float InFirstDelay = 1.0f;
 		GetWorldTimerManager().SetTimer(AsteroidSpawnTimerHandle,this,&AUEAsteroidsCloneGameModeBase::SpawnAsteroidTimerElapsed,AsteroidSpawnInterval, true, InFirstDelay);		
 	}
 
-	if(UFOToSpawn)
+	if(UFOToSpawn && !UFODataArray.IsEmpty())
 	{
 		GetWorldTimerManager().SetTimer(UFOSpawnTimerHandle, this, &AUEAsteroidsCloneGameModeBase::SpawnUFOTimerElapsed, UFOSpawnInterval, true);		
 	}
@@ -271,10 +271,16 @@ void AUEAsteroidsCloneGameModeBase::PlayerRetryTimerElapsed()
 		PlayerPawn->OnRetryHandler();
 
 		// Restart asteroid spawn timer
-		GetWorldTimerManager().SetTimer(AsteroidSpawnTimerHandle,this,&AUEAsteroidsCloneGameModeBase::SpawnAsteroidTimerElapsed,AsteroidSpawnInterval, true);
+		if(AsteroidToSpawn && !AsteroidsDataArray.IsEmpty())
+		{
+			GetWorldTimerManager().SetTimer(AsteroidSpawnTimerHandle,this,&AUEAsteroidsCloneGameModeBase::SpawnAsteroidTimerElapsed,AsteroidSpawnInterval, true);			
+		}
 
 		// Restart UFO spawn timer
-		GetWorldTimerManager().SetTimer(UFOSpawnTimerHandle,this,&AUEAsteroidsCloneGameModeBase::SpawnUFOTimerElapsed,UFOSpawnInterval, true);
+		if(UFOToSpawn && !UFODataArray.IsEmpty())
+		{
+			GetWorldTimerManager().SetTimer(UFOSpawnTimerHandle,this,&AUEAsteroidsCloneGameModeBase::SpawnUFOTimerElapsed,UFOSpawnInterval, true);			
+		}
 	}	
 }
 

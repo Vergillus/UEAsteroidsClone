@@ -54,19 +54,21 @@ void AAsteroid::InitializeAsteroid(UAsteroidDataAsset* Data)
 	// Rotate so that forward vector of the object facing the random facing direction
 	SetActorRotation(UKismetMathLibrary::FindLookAtRotation(GetActorForwardVector(), Direction));
 
+	// Set movement component velocity
 	MovementComponent->Velocity = GetActorForwardVector() * FMath::RandRange(DataAsset->AsteroidMinSpeed, DataAsset->AsteroidMaxSpeed);	
 }
 
 float AAsteroid::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator,
 	AActor* DamageCauser)
 {
-
 	if(DataAsset)
 	{
 		if(const auto GM = Cast<AUEAsteroidsCloneGameModeBase>(UGameplayStatics::GetGameMode(this)))
 		{
+			// Increase player score
 			GM->SetScore(DataAsset->ReceivedScore);
 
+			// If AsteroidType is Large or Medium tell GM to spawn more asteroids
 			if (DataAsset->AsteroidType == EAsteroidType::EAT_Large)
 			{
 				GM->SpawnAsteroidAtPosition(EAsteroidType::EAT_Medium, GetActorLocation());				

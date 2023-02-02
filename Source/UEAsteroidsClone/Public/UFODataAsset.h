@@ -45,12 +45,16 @@ public:
 	float LifeSpan;
 
 	/** Minimum UFO speed */
-	UPROPERTY(EditAnywhere);
+	UPROPERTY(EditAnywhere, Category= "Movement");
 	float UFOMinSpeed;
 
 	/** Maximum UFO speed */
-	UPROPERTY(EditAnywhere);
+	UPROPERTY(EditAnywhere, Category= "Movement");
 	float UFOMaxSpeed;
+
+	/** Start rotation In Degrees */
+	UPROPERTY(EditAnywhere, Category= "Movement");
+	float RandomRotationInDeg;
 
 	/** Duration to wait after attack initiated */
 	UPROPERTY(EditAnywhere);

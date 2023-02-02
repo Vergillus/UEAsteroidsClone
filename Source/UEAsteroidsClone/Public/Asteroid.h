@@ -18,6 +18,7 @@ class UEASTEROIDSCLONE_API AAsteroid : public AActor
 {
 	GENERATED_BODY()
 
+#pragma region Components
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<USphereComponent> RootComp;
 
@@ -32,6 +33,7 @@ class UEASTEROIDSCLONE_API AAsteroid : public AActor
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<ULifespanController> LifespanController;
+#pragma endregion 
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta=( AllowPrivateAccess = "true"))
 	UAsteroidDataAsset* DataAsset;
@@ -40,12 +42,12 @@ public:
 	// Sets default values for this actor's properties
 	AAsteroid();
 
+	/** Finishes the asteroid creation */
 	void InitializeAsteroid(UAsteroidDataAsset* Data);
 
-protected:	
-
-	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
+protected:
 	
+	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;	
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category= "VFX")
 	TObjectPtr<UParticleSystem> DeadParticle;

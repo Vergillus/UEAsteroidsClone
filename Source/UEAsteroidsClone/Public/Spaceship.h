@@ -31,28 +31,34 @@ class UEASTEROIDSCLONE_API ASpaceship : public APawn
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"), Category= "Movement")
 	TObjectPtr<UFloatingPawnMovement> PawnMovementComp;
 
+	/** New input system */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true") , Category= "Input")
 	UInputMappingContext* SpaceshipMappingContext;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UScreenWarper> ScreenWarperComp;
 
+	/** Spaceship movement/thruster audio component */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UAudioComponent> ShipAudioComponent;
 
+	/** Spaceship thruster niagara particle component */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UNiagaraComponent> SpaceshipThrusterNiagaraComponent;
 
 #pragma endregion 
 
+	/** Rotation speed of the spaceship*/
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"));
 	float RotationSpeed;
 
+	/** Bullet speed */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"));
 	float BulletSpeed;
 
 	const FName PlayerBulletTagName = "PlayerBullet";
 
+	/** Bullet material to be assigned to bullet  */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=( AllowPrivateAccess = "true"))
 	UMaterialInterface* BulletMaterial;
 	
@@ -91,12 +97,15 @@ protected:
 	
 #pragma endregion
 
+	/** Bullet class/bp to spawn */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TSubclassOf<ABullet> BulletToSpawn;
 
+	/** Socket name that bullet will be spawn at */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FName BulletSpawnSocketName;
 
+	/** Audio to play when firing a bullet */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category= "VFX | Sound")
 	TObjectPtr<USoundBase> FireSound;
 
@@ -105,7 +114,6 @@ protected:
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category= "VFX | Particle")
 	TObjectPtr<UParticleSystem> ExplosionParticle;
-
 
 	UFUNCTION()
 	void OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);

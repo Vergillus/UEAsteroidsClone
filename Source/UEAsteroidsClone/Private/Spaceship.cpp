@@ -51,6 +51,7 @@ void ASpaceship::BeginPlay()
 {
 	Super::BeginPlay();
 
+	// Initialization of new Input System
 	if (const APlayerController* PlayerController = Cast<APlayerController>(Controller))
 	{
 		if(UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
@@ -70,8 +71,7 @@ void ASpaceship::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ASpaceship::Move);
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Completed, this, &ASpaceship::MoveEnd);
 		EnhancedInputComponent->BindAction(RotateAction, ETriggerEvent::Triggered, this, &ASpaceship::RotateShip);
-		EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Started, this, &ASpaceship::Fire);
-		
+		EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Started, this, &ASpaceship::Fire);		
 	}
 
 }
@@ -118,12 +118,12 @@ void ASpaceship::Fire(const FInputActionValue& Value)
 	{
 		BulletClone->Tags.Add(PlayerBulletTagName);
 		BulletClone->InitializeBullet(GetActorForwardVector() * BulletSpeed, BulletMaterial);
-	}
 
-	if(FireSound)
-	{
-		UGameplayStatics::PlaySoundAtLocation(this, FireSound,BulletSpawnTransform.GetLocation());
-	}
+		if(FireSound)
+		{
+			UGameplayStatics::PlaySoundAtLocation(this, FireSound,BulletSpawnTransform.GetLocation());
+		}
+	}	
 }
 
 void ASpaceship::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
@@ -165,6 +165,7 @@ void ASpaceship::OnDeathHandler()
 		UGameplayStatics::SpawnEmitterAtLocation(this, ExplosionParticle, GetActorLocation());
 	}		
 
+	// Notify GameMode that player is dead
 	if(const auto GM = Cast<AUEAsteroidsCloneGameModeBase>(UGameplayStatics::GetGameMode(this)))
 	{
 		GM->PlayerDead();

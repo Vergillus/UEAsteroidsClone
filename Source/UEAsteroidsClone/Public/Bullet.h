@@ -16,6 +16,7 @@ class UEASTEROIDSCLONE_API ABullet : public AActor
 {
 	GENERATED_BODY()
 
+#pragma region Components
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<USphereComponent> RootComp;
 	
@@ -27,6 +28,7 @@ class UEASTEROIDSCLONE_API ABullet : public AActor
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UScreenWarper> ScreenWarperComp;
+#pragma endregion 
 	
 public:	
 	// Sets default values for this actor's properties
@@ -37,11 +39,13 @@ public:
 
 	FORCEINLINE TObjectPtr<USphereComponent> GetRootCollider() const { return RootComp;}
 
+	/** Finalizes the bullet spawn process */
 	UFUNCTION(BlueprintCallable)
 	void InitializeBullet(FVector Velocity, UMaterialInterface* BulletMat = nullptr);
 
 protected:
-	
+
+	/** Lifespan of the bullet */
 	UPROPERTY(EditDefaultsOnly)
 	float LifeTime;
 };

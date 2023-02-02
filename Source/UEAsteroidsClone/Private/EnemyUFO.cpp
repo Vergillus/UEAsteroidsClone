@@ -52,7 +52,7 @@ void AEnemyUFO::InitializeUFO(UUFODataAsset* DataAsset)
 
 	// Get random facing direction
 	FVector Direction = (FVector::Zero() - GetActorLocation()).GetSafeNormal();	
-	Direction = Direction.RotateAngleAxis(FMath::RandRange(-RandomRotationInDeg, RandomRotationInDeg), FVector::UpVector);
+	Direction = Direction.RotateAngleAxis(FMath::RandRange(-UFOData->RandomRotationInDeg, UFOData->RandomRotationInDeg), FVector::UpVector);
 
 	// Rotate so that forward vector of the object facing the random facing direction
 	SetActorRotation(UKismetMathLibrary::FindLookAtRotation(GetActorForwardVector(), Direction));
@@ -60,8 +60,11 @@ void AEnemyUFO::InitializeUFO(UUFODataAsset* DataAsset)
 	MovementComponent->Velocity = GetActorForwardVector() * FMath::RandRange(UFOData->UFOMinSpeed, UFOData->UFOMaxSpeed);
 
 	// Start Cooldown Timer with delay
-	GetWorldTimerManager().SetTimer(AttackCooldownTimerHandle, this, &AEnemyUFO::CooldownTimerElapsed,
-	                                UFOData->AttackCooldownDuration, true, UFOData->AttackCooldownDuration);
+	if(UFOData->BulletToSpawn)
+	{
+		GetWorldTimerManager().SetTimer(AttackCooldownTimerHandle, this, &AEnemyUFO::CooldownTimerElapsed,
+		                                UFOData->AttackCooldownDuration, true, UFOData->AttackCooldownDuration);		
+	}
 }
 
 
@@ -71,7 +74,7 @@ void AEnemyUFO::CooldownTimerElapsed()
 }
 
 void AEnemyUFO::Attack()
-{
+{		
 	if (const APawn* PlayerPawn =  UGameplayStatics::GetPlayerPawn(this,0))
 	{
 		const FVector BulletFacingDirection = (PlayerPawn->GetActorLocation() - GetActorLocation()).GetSafeNormal();

@@ -43,37 +43,50 @@ public:
 protected:
 
 	virtual void BeginPlay() override;
-	
+
+	/** Total number to allow player to continue after dead */
 	const int32 PlayerTotalRetryAmount = 3;
+
+	/** Current continue/retry number */
 	int32 PlayerCurrentRetryAmount;
 
+	/** Spawn interval for asteroid. Used by timer */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly , Category= "Spawn")
 	float AsteroidSpawnInterval;
 
+	/** Spawn interval for UFO. Used by timer */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly , Category= "Spawn")
 	float UFOSpawnInterval;
 
+	/** Value to delay used after players dead to delay player's retry */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly , Category= "Spawn")
 	float PlayerRetryDelay;
 
+	/** Asteroid class/bp to spawn*/
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<AAsteroid> AsteroidToSpawn;	
 
+	/** UFO class/bp to spawn */
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<AEnemyUFO> UFOToSpawn;	
-	
+
+	/** Array that holds asteroid data */
 	UPROPERTY(EditAnywhere)
 	TArray<UAsteroidDataAsset*> AsteroidsDataArray;
 
+	/** Array that holds UFO data */
 	UPROPERTY(EditAnywhere)
 	TArray<UUFODataAsset*> UFODataArray;
 
+	/** Main HUD Widget class/bp to create */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category= "UI")
 	TSubclassOf<UMainHUDWidget> MainHUDWidgetToCreate;
 
+	/** Reference to main hud widget */
 	UPROPERTY(BlueprintReadOnly)
 	TObjectPtr<UMainHUDWidget> MainHUDWidgetRef;
 
+	/** Array that holds 4 spawn directions. Used to get random direction */
 	const TArray<ESpawnDirections> SpawnDirections
 	{
 		ESpawnDirections::ESD_Top,
@@ -86,6 +99,8 @@ protected:
 
 	FTimerHandle AsteroidSpawnTimerHandle;
 	FTimerHandle UFOSpawnTimerHandle;
+
+	/** Timer handled to delay players restart/retry progress */
 	FTimerHandle PlayerRetryTimerHandle;
 #pragma endregion
 
@@ -101,6 +116,7 @@ protected:
 	void PlayerRetryTimerElapsed();
 #pragma endregion
 
+	/** Returns random spawn point */
 	FVector GetRandomSpawnPoint() const;
 
 	/* Spawns asteroids at random positions */

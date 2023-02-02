@@ -22,8 +22,8 @@ public:
 
 protected:
 	// Called when the game starts
-	virtual void BeginPlay() override;	
-
+	virtual void BeginPlay() override;
+	
 	TObjectPtr<APlayerController> PlayerController;
 
 	FVector2D ScreenLocation;
@@ -33,12 +33,14 @@ protected:
 
 	FVector WorldLocation, WorldDirection;
 
+	/** Teleports the owner of this component to opposite screen position of current screen position */
 	void WarpOwner(EWarpAxis WarpAxis) const;
 
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
+	/** Event fired when the owner if teleported via WarpOwner function */
 	UPROPERTY(BlueprintAssignable)
 	FOnActorWarped OnActorWarped;
 		
